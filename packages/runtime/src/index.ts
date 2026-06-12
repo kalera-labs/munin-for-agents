@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { MuninSdkError } from "@kalera/munin-sdk";
 
 export interface ParsedCliArgs {
   action: string;
@@ -156,6 +157,15 @@ export async function executeWithRetry<T>(
 }
 
 export function safeError(error: unknown): Record<string, unknown> {
+  if (error instanceof MuninSdkError) {
+    return {
+      name: error.name,
+      message: redactText(error.message),
+      code: error.code,
+      ...(error.details ? { details: redactValue(error.details) } : {}),
+    };
+  }
+
   if (error instanceof Error) {
     return {
       name: error.name,
@@ -164,6 +174,26 @@ export function safeError(error: unknown): Record<string, unknown> {
   }
 
   return { message: redactText(String(error)) };
+}
+
+function redactValue(value: unknown): unknown {
+  if (typeof value === "string") {
+    return redactText(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map(redactValue);
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        REDACT_KEYS.some((redactKey) => redactKey.toLowerCase() === key.toLowerCase())
+          ? "[REDACTED]"
+          : redactValue(entry),
+      ]),
+    );
+  }
+  return value;
 }
 
 function redactText(text: string): string {

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { MuninSdkError } from "@kalera/munin-sdk";
 import { createMcpServerInstance } from "../src/mcp-server.js";
+import { safeError } from "../src/index.js";
 
 interface ToolResult {
   isError?: boolean;
@@ -23,6 +25,34 @@ function expectValidationError(result: ToolResult, toolName: string, scenario: s
 }
 
 async function run() {
+  assert.deepEqual(
+    safeError(new MuninSdkError({
+      code: "ERR_STALE_PROTOCOL",
+      message: "ERR_STALE_PROTOCOL",
+      details: {
+        remediation: {
+          version: "2026-04-17",
+          setupGuideUrl: "https://example.test/setup",
+          apiKey: "secret-value",
+          instruction: "token=secret-value",
+        },
+      },
+    })),
+    {
+      name: "MuninSdkError",
+      message: "ERR_STALE_PROTOCOL",
+      code: "ERR_STALE_PROTOCOL",
+      details: {
+        remediation: {
+          version: "2026-04-17",
+          setupGuideUrl: "https://example.test/setup",
+          apiKey: "[REDACTED]",
+          instruction: "token=[REDACTED]",
+        },
+      },
+    },
+  );
+
   const server = createMcpServerInstance(
     {
       baseUrl: "https://munin.kalera.dev",
