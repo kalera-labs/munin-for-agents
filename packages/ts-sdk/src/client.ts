@@ -1,5 +1,6 @@
 import { MuninSdkError, MuninTransportError } from "./errors.js";
 import { fetchCapabilities, isActionSupported } from "./capabilities.js";
+import { VERSION } from "@kalera/munin-shared-version";
 import type {
   MuninAction,
   MuninClientConfig,
@@ -63,7 +64,7 @@ export class MuninClient {
         requestId: options?.requestId,
         client: {
           name: "@kalera/munin-sdk",
-          version: "1.4.1",
+          version: VERSION,
         },
       }),
       signal: controller.signal,
@@ -81,7 +82,23 @@ export class MuninClient {
     if (!response.ok || (body.ok === false) || (body.success === false)) {
       let errObj = body.error;
       if (typeof errObj === "string") {
-        errObj = { code: "INTERNAL_ERROR", message: errObj };
+        errObj = {
+          code: errObj === "ERR_STALE_PROTOCOL" ? errObj : "INTERNAL_ERROR",
+          message: errObj,
+        };
+      }
+
+      if (body.remediation && typeof body.remediation === "object") {
+        errObj = {
+          ...(errObj ?? {
+            code: "INTERNAL_ERROR",
+            message: `Unexpected failure invoking action '${action}'`,
+          }),
+          details: {
+            ...(errObj?.details ?? {}),
+            remediation: body.remediation,
+          },
+        };
       }
 
       throw new MuninSdkError(

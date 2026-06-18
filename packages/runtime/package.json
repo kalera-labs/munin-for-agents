@@ -17,8 +17,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.27.1",
-    "@kalera/munin-sdk": "workspace:*"
+    "@kalera/munin-sdk": "workspace:*",
+    "@kalera/munin-shared-version": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.27.1"
   },
   "version": "1.4.4"
 }

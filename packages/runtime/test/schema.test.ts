@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { SERVER_VERSION } from "@kalera/munin-shared-version";
 import { createMcpServerInstance } from "../src/mcp-server.js";
 
 async function run() {
@@ -30,6 +31,8 @@ async function run() {
     server.connect(serverTransport),
     client.connect(clientTransport),
   ]);
+
+  assert.equal(client.getServerVersion()?.version, SERVER_VERSION);
 
   const response = await client.listTools();
 
