@@ -31,7 +31,6 @@ async function run() {
     server.connect(serverTransport),
     client.connect(clientTransport),
   ]);
-
   assert.equal(client.getServerVersion()?.version, SERVER_VERSION);
 
   const response = await client.listTools();

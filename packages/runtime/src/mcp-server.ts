@@ -5,7 +5,6 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { MuninClient } from "@kalera/munin-sdk";
-import { SERVER_VERSION } from "@kalera/munin-shared-version";
 import { loadCliEnv, resolveProjectId, resolveEncryptionKey, safeError } from "./index.js";
 
 function hasSingleIdentifier(args: Record<string, unknown>): args is Record<string, unknown> & { key?: string; id?: string } {
@@ -33,7 +32,7 @@ export function createMcpServerInstance(
   const server = new Server(
     {
       name: "munin-mcp-server",
-      version: SERVER_VERSION,
+      version: "1.4.1",
     },
     {
       capabilities: {

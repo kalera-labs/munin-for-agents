@@ -70,10 +70,6 @@ codex mcp list
 # expect: munin-memory  ...  enabled
 ```
 
-After upgrading the package or changing the MCP registration, fully exit and restart Codex.
-Codex keeps the MCP subprocess and its advertised tool schemas for the lifetime of the session;
-`@latest` is resolved only when a new subprocess starts.
-
 For E2EE projects, the server still needs `MUNIN_ENCRYPTION_KEY`, but keep it project-local in
 `.env.local` alongside the project ID.
 
@@ -231,8 +227,6 @@ If `AGENTS.md` does not exist, create it with just this section.
 | Garbled content | E2EE project, wrong key | Re-add with `--env "MUNIN_ENCRYPTION_KEY=<hash-key>"` |
 | `EAI_AGAIN` / network error | DNS/proxy issue | Confirm `MUNIN_BASE_URL` is unset or `https://munin.kalera.dev` |
 | First startup feels slow | `npx` is fetching or resolving the package | Warm the cache once with `npx -y @kalera/munin-mcp-server@latest` or use the global-binary path |
-| Upgrade completed but tools/version still look old | Existing Codex session is still using its original MCP subprocess | Fully exit Codex and start a new session; `@latest` is resolved only when the subprocess starts |
-| `npm`/`npx` reports `ENOTFOUND registry.npmjs.org` | Registry DNS or network access failed, so the latest package was not fetched | Restore npm registry connectivity, verify with `npm view @kalera/munin-mcp-server version`, then restart Codex |
 
 ---
 

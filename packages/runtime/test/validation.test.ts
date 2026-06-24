@@ -52,7 +52,6 @@ async function run() {
       },
     },
   );
-
   const server = createMcpServerInstance(
     {
       baseUrl: "https://munin.kalera.dev",

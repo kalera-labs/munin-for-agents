@@ -11,9 +11,7 @@
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "tsx test/client.test.ts"
   },
-  "dependencies": {
-    "@kalera/munin-shared-version": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.9.2",
     "tsx": "^4.20.5"
