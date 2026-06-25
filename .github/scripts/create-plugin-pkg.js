@@ -9,7 +9,7 @@ const pluginJson = JSON.parse(
 );
 
 const pkg = {
-  name: '@kalera/munin-claude-plugin',
+  name: '@kalera/munin-claude',
   version: pluginJson.version,
   description: pluginJson.description || '',
   author: pluginJson.author
