@@ -9,5 +9,5 @@
  *   node scripts/bump-version.ts <new-version>
  */
 
-export const VERSION = "1.4.4";
+export const VERSION = "1.5.0";
 export const SERVER_VERSION = VERSION;

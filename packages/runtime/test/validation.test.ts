@@ -64,7 +64,7 @@ async function run() {
   );
 
   const client = new Client(
-    { name: "runtime-validation-test-client", version: "1.4.4" },
+    { name: "runtime-validation-test-client", version: "1.5.0" },
     { capabilities: {} },
   );
 

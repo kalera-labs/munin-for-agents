@@ -8,5 +8,5 @@
  * Release workflow:
  *   node scripts/bump-version.ts <new-version>
  */
-export declare const VERSION = "1.4.1";
-export declare const SERVER_VERSION = "1.4.1";
+export declare const VERSION = "1.5.0";
+export declare const SERVER_VERSION = "1.5.0";
