@@ -81,15 +81,28 @@ export class MuninClient {
     if (!response.ok || (body.ok === false) || (body.success === false)) {
       let errObj = body.error;
       if (typeof errObj === "string") {
-        errObj = { code: "INTERNAL_ERROR", message: errObj };
+        // The server may return `error` as a bare string code
+        // (e.g. "ERR_STALE_PROTOCOL"); use it as both the code and message
+        // instead of flattening every string error into INTERNAL_ERROR.
+        errObj = { code: errObj, message: errObj };
       }
-
-      throw new MuninSdkError(
-        errObj ?? {
+      if (!errObj) {
+        errObj = {
           code: "INTERNAL_ERROR" as const,
           message: `Unexpected failure invoking action '${action}'`,
-        },
-      );
+        };
+      }
+      // A top-level `remediation` (sent alongside the error envelope, e.g. for
+      // ERR_STALE_PROTOCOL) is folded into `details` so callers can read it via
+      // MuninSdkError.details without losing any existing structured details.
+      if (body.remediation !== undefined) {
+        errObj = {
+          ...errObj,
+          details: { ...(errObj.details ?? {}), remediation: body.remediation },
+        };
+      }
+
+      throw new MuninSdkError(errObj);
     }
 
     return body as any;

@@ -157,13 +157,51 @@ export async function executeWithRetry<T>(
 
 export function safeError(error: unknown): Record<string, unknown> {
   if (error instanceof Error) {
-    return {
+    const safe: Record<string, unknown> = {
       name: error.name,
       message: redactText(error.message),
     };
+
+    // MuninSdkError carries structured `code` + `details`; preserve them so
+    // callers can branch on the code, but redact any secrets nested in details
+    // (both secret-named keys and inline `token=...` patterns in values).
+    const sdkError = error as Error & { code?: unknown; details?: unknown };
+    if (error.name === "MuninSdkError") {
+      if (sdkError.code !== undefined) safe.code = sdkError.code;
+      if (sdkError.details !== undefined) safe.details = redactValue(sdkError.details);
+    }
+
+    return safe;
   }
 
   return { message: redactText(String(error)) };
+}
+
+function isSecretKey(key: string): boolean {
+  const lower = key.toLowerCase();
+  return REDACT_KEYS.some((redactKey) => redactKey.toLowerCase() === lower);
+}
+
+/**
+ * Recursively redact secrets from an arbitrary value. A property whose KEY is a
+ * known secret (apiKey, token, …) has its value replaced wholesale; every other
+ * string is passed through inline `redactText` so embedded `token=...` secrets
+ * are scrubbed without losing surrounding context.
+ */
+function redactValue(value: unknown): unknown {
+  if (typeof value === "string") return redactText(value);
+  if (Array.isArray(value)) return value.map((item) => redactValue(item));
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) {
+      out[key] =
+        isSecretKey(key) && (val === null || typeof val !== "object")
+          ? "[REDACTED]"
+          : redactValue(val);
+    }
+    return out;
+  }
+  return value;
 }
 
 function redactText(text: string): string {

@@ -45,7 +45,8 @@ export interface MuninError {
     | "NOT_FOUND"
     | "RATE_LIMITED"
     | "VALIDATION_ERROR"
-    | "INTERNAL_ERROR";
+    | "INTERNAL_ERROR"
+    | "ERR_STALE_PROTOCOL";
   message: string;
   details?: Record<string, unknown>;
 }
