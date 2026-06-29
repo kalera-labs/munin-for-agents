@@ -140,8 +140,29 @@ jobs:
             fi
           }
           if [ "${{ needs.release-routing.outputs.mode }}" = "all" ]; then
-            echo "Publishing all packages in recursive mode..."
-            publish_safely "pnpm publish -r --no-git-checks --access public"
+            # Publish each non-private package independently. `pnpm publish -r`
+            # bails on the FIRST per-package error (e.g. an already-published
+            # version, or npm's 24h block after an unpublish), leaving every
+            # package after it unpublished. Looping + per-package publish_safely
+            # makes the release idempotent: already-published packages are
+            # skipped and the rest still publish.
+            echo "Publishing all non-private workspace packages individually..."
+            FAILED=""
+            for dir in packages/* adapters/*; do
+              [ -f "$dir/package.json" ] || continue
+              IS_PRIVATE=$(node -p "require('./$dir/package.json').private === true" 2>/dev/null || echo "false")
+              if [ "$IS_PRIVATE" = "true" ]; then
+                echo "Skipping private package: $dir"
+                continue
+              fi
+              PKG_NAME=$(node -p "require('./$dir/package.json').name" 2>/dev/null)
+              echo "→ Publishing $PKG_NAME ($dir)"
+              publish_safely "pnpm publish -C $dir --no-git-checks --access public" || FAILED="$FAILED $PKG_NAME"
+            done
+            if [ -n "$FAILED" ]; then
+              echo "::error::Failed to publish:$FAILED"
+              exit 1
+            fi
           else
             echo "Publishing single package in ${{ needs.release-routing.outputs.target }}..."
             publish_safely "pnpm publish --no-git-checks --access public -C ${{ needs.release-routing.outputs.target }}"
