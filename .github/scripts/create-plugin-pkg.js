@@ -9,7 +9,12 @@ const pluginJson = JSON.parse(
 );
 
 const pkg = {
-  name: '@kalera/munin-claude',
+  // ⚠️ DO NOT rename to '@kalera/munin-claude'. That npm name belongs to the
+  // ADAPTER CLI (adapters/claude, `bin: munin-claude`), which the plugin invokes
+  // at runtime via `npx @kalera/munin-claude` (.mcp.json + session-start hook).
+  // Publishing the plugin under that name overwrites the CLI and breaks recall.
+  // The '-plugin' suffix keeps the two npm packages distinct on purpose.
+  name: '@kalera/munin-claude-plugin',
   version: pluginJson.version,
   description: pluginJson.description || '',
   author: pluginJson.author
