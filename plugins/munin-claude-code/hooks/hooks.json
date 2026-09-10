@@ -52,12 +52,5 @@
         ]
       }
     ]
-  },
-  "configuration": {
-    "enabled": true,
-    "defaultThrottle": {
-      "maxPerSession": 20,
-      "minIntervalSeconds": 5
-    }
   }
 }
