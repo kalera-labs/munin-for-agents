@@ -13,7 +13,7 @@
       "name": "munin-claude-code",
       "source": {
         "source": "git-subdir",
-        "url": "3d-era/munin-for-agents",
+        "url": "kalera-labs/munin-for-agents",
         "path": "plugins/munin-claude-code"
       },
       "description": "Long-term memory integration for Claude Code. Munin 🐦‍⬛ — your project's memory companion. Automatically loads relevant memories at session start, saves summaries on exit, and maintains an error catalog.",
@@ -23,7 +23,7 @@
         "email": "munin@kalera.app"
       },
       "homepage": "https://munin.kalera.ai",
-      "repository": "https://github.com/3d-era/munin-for-agents",
+      "repository": "https://github.com/kalera-labs/munin-for-agents",
       "license": "MIT",
       "keywords": ["memory", "ai", "graphrag", "knowledge-graph", "context", "developer-tools"],
       "readme": "plugins/munin-claude-code/README.md"

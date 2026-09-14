@@ -1,7 +1,7 @@
 # Munin AI Setup Guide
 
 > **Version:** 1.0.0
-> **Source:** [3d-era/munin-for-agents](https://github.com/3d-era/munin-for-agents)
+> **Source:** [3d-era/munin-for-agents](https://github.com/kalera-labs/munin-for-agents)
 > **Last Updated:** 2026-04-14
 
 A step-by-step guide for AI agents to install and configure Munin — the persistent memory layer — using only the credentials provided by the user.

@@ -1,7 +1,7 @@
 # Munin Claude Code Plugin
 
-> **Full setup guide:** [docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)
-> **Quick reference:** [agent-files/SETUP.md](https://github.com/3d-era/munin-for-agents/blob/main/agent-files/SETUP.md)
+> **Full setup guide:** [docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)
+> **Quick reference:** [agent-files/SETUP.md](https://github.com/kalera-labs/munin-for-agents/blob/main/agent-files/SETUP.md)
 
 This plugin gives Claude Code persistent memory via Munin Context Core — memories survive across sessions, enabling semantic search, error catalogs, and GraphRAG.
 
@@ -71,7 +71,7 @@ munin-claude env set MUNIN_PROJECT <project>
 Keep `MUNIN_API_KEY` and `MUNIN_PROJECT` in `.env.local` at the project root so credentials stay
 project-scoped and can be rotated or changed per repo without editing global agent config. The
 runtime walks up the directory tree automatically. See
-[docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)
+[docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)
 for details.
 
 ---
@@ -114,6 +114,6 @@ munin-claude-code/
     └── munin-projectid/
 ```
 
-For detailed setup instructions, E2EE guidance, and cross-platform setup, see **[docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)**.
+For detailed setup instructions, E2EE guidance, and cross-platform setup, see **[docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)**.
 
 ABC

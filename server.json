@@ -1,11 +1,11 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.3d-era/munin-mcp-server",
+  "name": "io.github.kalera-labs/munin-mcp-server",
   "title": "Munin AI Memory",
   "description": "Pragmatic long-term memory for AI agents with Multi-Project support and GraphRAG. FREE FOREVER.",
   "websiteUrl": "https://munin.kalera.ai",
   "repository": {
-    "url": "https://github.com/3d-era/munin-for-agents",
+    "url": "https://github.com/kalera-labs/munin-for-agents",
     "source": "github"
   },
   "packages": [

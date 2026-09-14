@@ -21,10 +21,10 @@ const pkg = {
     ? `${pluginJson.author.name} <${pluginJson.author.email}>`
     : 'Kalera <hoang.kal@gmail.com>',
   license: pluginJson.license || 'MIT',
-  repository: pluginJson.repository || 'https://github.com/3d-era/munin-for-agents',
+  repository: pluginJson.repository || 'https://github.com/kalera-labs/munin-for-agents',
   homepage: pluginJson.repository
     ? pluginJson.repository.replace('.git', '') + '#readme'
-    : 'https://github.com/3d-era/munin-for-agents#readme',
+    : 'https://github.com/kalera-labs/munin-for-agents#readme',
   keywords: pluginJson.keywords || [],
   files: ['plugins/munin-claude-code'],
   main: 'plugins/munin-claude-code/.claude-plugin/plugin.json',

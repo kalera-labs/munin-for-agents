@@ -1,6 +1,6 @@
 # Munin Setup Reference
 
-> For full step-by-step setup instructions, see: **[docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)**
+> For full step-by-step setup instructions, see: **[docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)**
 
 ---
 
@@ -108,4 +108,4 @@ Always call as MCP tools — never as shell commands.
 
 ---
 
-*Full guide: [docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)*
+*Full guide: [docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)*

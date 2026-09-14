@@ -190,12 +190,12 @@ Tag as `architecture` + `decision`, include timeline/version
 | 🌐 **Website** | [munin.kalera.app](https://munin.kalera.app)                                                   |
 | 📖 **Docs** | [munin.kalera.app/docs](https://munin.kalera.app/docs)                                         |
 | 💬 **Discord** | Coming soon                                                                                    |
-| 🐛 **Issues** | [github.com/3d-era/munin-for-agents/issues](https://github.com/3d-era/munin-for-agents/issues) |
+| 🐛 **Issues** | [github.com/kalera-labs/munin-for-agents/issues](https://github.com/kalera-labs/munin-for-agents/issues) |
 | 📦 **npm** | [npmjs.com/package/@kalera/munin-claude](https://npmjs.com/package/@kalera/munin-claude)       |
-| 🔌 **Gemini Extension** | [github.com/3d-era/munin-gemini-extension](https://github.com/3d-era/munin-gemini-extension)   |
+| 🔌 **Gemini Extension** | [github.com/kalera-labs/munin-gemini-extension](https://github.com/kalera-labs/munin-gemini-extension)   |
 
 ---
 
 ## License
 
-MIT — [github.com/3d-era/munin-for-agents](https://github.com/3d-era/munin-for-agents)
+MIT — [github.com/kalera-labs/munin-for-agents](https://github.com/kalera-labs/munin-for-agents)

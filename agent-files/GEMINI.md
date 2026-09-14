@@ -1,7 +1,7 @@
 # Munin Claude Code Plugin — Gemini Extension
 
-> **Full setup guide:** [docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)
-> **Quick reference:** [agent-files/SETUP.md](https://github.com/3d-era/munin-for-agents/blob/main/agent-files/SETUP.md)
+> **Full setup guide:** [docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)
+> **Quick reference:** [agent-files/SETUP.md](https://github.com/kalera-labs/munin-for-agents/blob/main/agent-files/SETUP.md)
 
 This extension gives Gemini CLI persistent memory via Munin Context Core — memories survive across sessions, enabling semantic search, error catalogs, and GraphRAG.
 
@@ -53,7 +53,7 @@ export MUNIN_API_KEY="<key>"
 export MUNIN_PROJECT="<project>"
 ```
 
-Both `MUNIN_API_KEY` and `MUNIN_PROJECT` can be set in `.env.local` at the project root — the runtime walks up the directory tree automatically. See [docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md) for details.
+Both `MUNIN_API_KEY` and `MUNIN_PROJECT` can be set in `.env.local` at the project root — the runtime walks up the directory tree automatically. See [docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md) for details.
 
 ---
 
@@ -82,4 +82,4 @@ munin-claude-code/
 └── skills/                # 4 specialized skills
 ```
 
-For detailed setup instructions, E2EE guidance, and cross-platform setup, see **[docs/ai-setup-guide.md](https://github.com/3d-era/munin-for-agents/blob/main/docs/ai-setup-guide.md)**.
+For detailed setup instructions, E2EE guidance, and cross-platform setup, see **[docs/ai-setup-guide.md](https://github.com/kalera-labs/munin-for-agents/blob/main/docs/ai-setup-guide.md)**.
