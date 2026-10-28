@@ -22,7 +22,7 @@ async function run() {
               encryption: { supported: true },
             },
             metadata: {
-              serverVersion: "1.5.0",
+              serverVersion: "1.6.0",
               timestamp: new Date().toISOString(),
             },
           },

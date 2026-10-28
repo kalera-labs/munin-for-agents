@@ -46,7 +46,8 @@ export interface MuninError {
     | "RATE_LIMITED"
     | "VALIDATION_ERROR"
     | "INTERNAL_ERROR"
-    | "ERR_STALE_PROTOCOL";
+    | "ERR_STALE_PROTOCOL"
+    | "MAINTENANCE_READ_ONLY";
   message: string;
   details?: Record<string, unknown>;
 }
@@ -63,4 +64,21 @@ export interface MuninClientConfig {
   apiKey?: string;
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
+  /** Where refused writes wait. Default: ~/.munin under Node, none elsewhere. `false` disables queueing. */
+  writeQueue?: import("./writeQueue.js").PendingWriteQueue | false;
+  maintenanceRetry?: Partial<import("./maintenance.js").MaintenanceRetryPolicy>;
+  /**
+   * Before a write, how long the client may spend sending older queued writes
+   * (default 5000). Whatever is still queued for the same project after that
+   * makes the new write queue behind it instead of overtaking it.
+   */
+  flushBeforeWriteMs?: number;
+  /**
+   * Optionally re-adds stripped secrets (e.g. encryptionKey) at flush time.
+   * Never required: the server ignores payload secrets on /api/mcp/action, so
+   * null (or no rehydrator) sends the stored payload as is.
+   */
+  rehydratePayload?: (payload: Record<string, unknown>, strippedKeys: string[]) => Record<string, unknown> | null;
+  /** Test seam. */
+  sleep?: (ms: number) => Promise<void>;
 }

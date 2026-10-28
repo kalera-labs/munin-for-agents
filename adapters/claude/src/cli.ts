@@ -9,6 +9,9 @@ import {
 } from "@kalera/munin-runtime";
 import { createClaudeCodeMuninAdapter } from "./index.js";
 
+/** How long the one-shot CLI may spend sending queued writes before it exits. */
+const CLI_FLUSH_BUDGET_MS = 5_000;
+
 async function main() {
   try {
     const args = process.argv.slice(2);
@@ -90,6 +93,11 @@ async function main() {
     }, env.retries, env.backoffMs);
 
     console.log(JSON.stringify(result, null, 2));
+    // A one-shot CLI (the plugin's session-start hook runs it once per session)
+    // exits right after this: let queued writes go out first, bounded. The
+    // deadline also tightens a flush the SDK started after the call succeeded,
+    // so the rest stays queued, in order, instead of holding the process open.
+    await adapter.flushPendingWrites(Date.now() + CLI_FLUSH_BUDGET_MS).catch(() => undefined);
   } catch (error) {
     console.error(JSON.stringify({ ok: false, error: safeError(error) }));
     process.exitCode = 1;

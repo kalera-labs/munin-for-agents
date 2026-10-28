@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "echo 'adapter-claude-code tests: pending'"
+    "test": "tsx test/cli-flush.test.ts"
   },
   "dependencies": {
     "@kalera/munin-sdk": "workspace:*",
@@ -17,5 +17,5 @@
     "@types/node": "^24.3.0",
     "typescript": "^5.9.2"
   },
-  "version": "1.5.0"
+  "version": "1.6.0"
 }

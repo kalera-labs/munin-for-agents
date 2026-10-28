@@ -4,7 +4,8 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { MuninClient } from "@kalera/munin-sdk";
+import { MuninClient, MuninMaintenanceError } from "@kalera/munin-sdk";
+import { createFileWriteQueue } from "@kalera/munin-sdk/node";
 import { loadCliEnv, resolveProjectId, resolveEncryptionKey, safeError } from "./index.js";
 
 function hasSingleIdentifier(args: Record<string, unknown>): args is Record<string, unknown> & { key?: string; id?: string } {
@@ -23,16 +24,41 @@ export function createMcpServerInstance(
     );
   }
 
+  const writeQueue = createFileWriteQueue();
   const client = new MuninClient({
     baseUrl: env.baseUrl,
     apiKey: env.apiKey,
     timeoutMs: env.timeoutMs,
+    writeQueue,
+    // The queue never stores encryptionKey; the flush re-adds the environment
+    // key like a live call does. Without one the stored payload is sent as is
+    // (the server ignores payload.encryptionKey on /api/mcp/action).
+    rehydratePayload: (payload, strippedKeys) => {
+      if (!strippedKeys.includes("encryptionKey")) return payload;
+      const encryptionKey = resolveEncryptionKey();
+      return encryptionKey ? { ...payload, encryptionKey } : null;
+    },
   });
+  // Process start: send whatever a maintenance window left behind.
+  void client.flushPendingWrites().catch(() => undefined);
+
+  /** Queued writes dead-lettered since the last tool result, reported once. */
+  const queueNotice = () => {
+    const deadLettered = client.takeDeadLetterCount();
+    if (deadLettered === 0) return {};
+    return {
+      queueNotice: {
+        deadLettered,
+        file: writeQueue.deadLetterFile,
+        message: `${deadLettered} Munin write(s) queued during maintenance could not be delivered (rejected, still failing, or older than 24 h) and were moved to ${writeQueue.deadLetterFile}.`,
+      },
+    };
+  };
 
   const server = new Server(
     {
       name: "munin-mcp-server",
-      version: "1.5.0",
+      version: "1.6.0",
     },
     {
       capabilities: {
@@ -337,15 +363,32 @@ export function createMcpServerInstance(
           throw new Error(`Unknown tool: ${request.params.name}`);
       }
 
+      const notice = queueNotice();
+      const annotated = result && typeof result === "object" && !Array.isArray(result) ? { ...result, ...notice } : result;
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(result, null, 2),
+            text: JSON.stringify(annotated, null, 2),
           },
         ],
       };
     } catch (error) {
+      // A queued write is a successful, clearly worded result so an agent does
+      // not hammer the server; a refused read is an error.
+      if (error instanceof MuninMaintenanceError) {
+        const pendingWrites = await writeQueue.size().catch(() => undefined);
+        const body = { ok: false, maintenance: true, queued: error.queued, message: error.message, pendingWrites, ...queueNotice() };
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(body, null, 2),
+            },
+          ],
+          isError: !error.queued,
+        };
+      }
       const errObj = safeError(error);
       return {
         content: [

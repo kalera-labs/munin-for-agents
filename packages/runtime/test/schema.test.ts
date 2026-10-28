@@ -19,7 +19,7 @@ async function run() {
   const client = new Client(
     {
       name: "runtime-schema-test-client",
-      version: "1.5.0",
+      version: "1.6.0",
     },
     {
       capabilities: {},

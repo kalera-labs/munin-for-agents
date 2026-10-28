@@ -1,12 +1,13 @@
 {
   "name": "munin-ecosystem",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.6.0",
   "packageManager": "pnpm@10.16.0",
   "scripts": {
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "test:hooks": "bash tests/hooks/session-start-hook.test.sh",
     "test:contract": "tsx tests/contract/runner.ts",
     "test:contract:mock": "tsx tests/contract/mock-server.ts",
     "test:contract:port": "tsx tests/contract/runner.ts"

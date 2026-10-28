@@ -145,6 +145,8 @@ export async function executeWithRetry<T>(
       return await task();
     } catch (error) {
       lastError = error;
+      // The SDK already retried a maintenance refusal (and queued a write): never resend it here.
+      if ((error as { retryable?: unknown } | null)?.retryable === false) break;
       attempt += 1;
       if (attempt >= retries) break;
       const jitter = Math.floor(Math.random() * 100);
@@ -166,7 +168,7 @@ export function safeError(error: unknown): Record<string, unknown> {
     // callers can branch on the code, but redact any secrets nested in details
     // (both secret-named keys and inline `token=...` patterns in values).
     const sdkError = error as Error & { code?: unknown; details?: unknown };
-    if (error.name === "MuninSdkError") {
+    if (error.name === "MuninSdkError" || error.name === "MuninMaintenanceError") {
       if (sdkError.code !== undefined) safe.code = sdkError.code;
       if (sdkError.details !== undefined) safe.details = redactValue(sdkError.details);
     }
