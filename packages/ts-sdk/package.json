@@ -18,5 +18,10 @@
     "typescript": "^5.9.2",
     "tsx": "^4.20.5"
   },
-  "version": "1.6.0"
+  "version": "1.6.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalera-labs/munin-for-agents.git",
+    "directory": "packages/ts-sdk"
+  }
 }

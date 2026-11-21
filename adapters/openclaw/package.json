@@ -32,5 +32,10 @@
   "peerDependencies": {
     "openclaw": "^2026.3.0"
   },
-  "version": "1.6.0"
+  "version": "1.6.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalera-labs/munin-for-agents.git",
+    "directory": "adapters/openclaw"
+  }
 }

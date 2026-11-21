@@ -1,6 +1,6 @@
 name: Release
 permissions:
-  contents: write
+  contents: read
 
 on:
   workflow_dispatch:
@@ -74,25 +74,26 @@ jobs:
     steps:
       - name: Resolve package from tag
         id: resolve
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          TAG="${{ github.event.inputs.tag || github.ref_name }}"
           echo "Release tag: ${TAG}"
           if [ "${TAG}" = "all" ]; then
-            echo "mode=all" >> $GITHUB_OUTPUT
+            echo "mode=all" >> "$GITHUB_OUTPUT"
           else
-            echo "mode=single" >> $GITHUB_OUTPUT
+            echo "mode=single" >> "$GITHUB_OUTPUT"
             case "${TAG}" in
-              spec-v*) echo "target=packages/spec" >> $GITHUB_OUTPUT ;;
-              munin-sdk-v*) echo "target=packages/ts-sdk" >> $GITHUB_OUTPUT ;;
-              sdk-py-v*) echo "target=packages/python-sdk" >> $GITHUB_OUTPUT ;;
-              munin-cursor-v*) echo "target=adapters/cursor" >> $GITHUB_OUTPUT ;;
-              munin-claude-v*) echo "target=adapters/claude" >> $GITHUB_OUTPUT ;;
-              munin-gemini-v*) echo "target=adapters/gemini" >> $GITHUB_OUTPUT ;;
-              munin-openclaw-v*) echo "target=adapters/openclaw" >> $GITHUB_OUTPUT ;;
-              munin-mcp-server-v*) echo "target=adapters/mcp-server" >> $GITHUB_OUTPUT ;;
-              munin-antigravity-v*) echo "target=adapters/antigravity" >> $GITHUB_OUTPUT ;;
-              munin-kilo-v*) echo "target=adapters/kilo" >> $GITHUB_OUTPUT ;;
-              munin-qwen-v*) echo "target=adapters/qwen" >> $GITHUB_OUTPUT ;;
+              spec-v*) echo "target=packages/spec" >> "$GITHUB_OUTPUT" ;;
+              munin-sdk-v*) echo "target=packages/ts-sdk" >> "$GITHUB_OUTPUT" ;;
+              sdk-py-v*) echo "target=packages/python-sdk" >> "$GITHUB_OUTPUT" ;;
+              munin-cursor-v*) echo "target=adapters/cursor" >> "$GITHUB_OUTPUT" ;;
+              munin-claude-v*) echo "target=adapters/claude" >> "$GITHUB_OUTPUT" ;;
+              munin-gemini-v*) echo "target=adapters/gemini" >> "$GITHUB_OUTPUT" ;;
+              munin-openclaw-v*) echo "target=adapters/openclaw" >> "$GITHUB_OUTPUT" ;;
+              munin-mcp-server-v*) echo "target=adapters/mcp-server" >> "$GITHUB_OUTPUT" ;;
+              munin-antigravity-v*) echo "target=adapters/antigravity" >> "$GITHUB_OUTPUT" ;;
+              munin-kilo-v*) echo "target=adapters/kilo" >> "$GITHUB_OUTPUT" ;;
+              munin-qwen-v*) echo "target=adapters/qwen" >> "$GITHUB_OUTPUT" ;;
               *) echo "Unsupported tag format"; exit 1 ;;
             esac
           fi
@@ -100,6 +101,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: release-routing
+    # Trusted publishing (OIDC): npm accepts this job because the trusted
+    # publisher of every package names kalera-labs/munin-for-agents,
+    # release.yml and the environment below. No npm token is used.
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -107,12 +115,12 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
 
+      # Node 24 ships npm 11 (trusted publishing needs >= 11.5.1).
+      # No dependency cache in the release job.
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          node-version: 24
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -121,49 +129,28 @@ jobs:
         run: pnpm build
 
       - name: Publish
+        env:
+          MODE: ${{ needs.release-routing.outputs.mode }}
+          TARGET: ${{ needs.release-routing.outputs.target }}
         run: |
-          npm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}"
-          # Skip duplicate-version errors so partial re-runs / unchanged packages don't break the workflow
-          publish_safely() {
-            local cmd="$1"
-            set +e
-            OUT=$(eval "$cmd" 2>&1)
-            CODE=$?
-            set -e
-            echo "$OUT"
-            if [ "$CODE" -ne 0 ]; then
-              if echo "$OUT" | grep -qiE "previously published|cannot publish over|EPUBLISHCONFLICT|403"; then
-                echo "::warning::Skipping already-published version(s)"
-                return 0
-              fi
-              return "$CODE"
+          set -euo pipefail
+          if [ "$MODE" != "all" ]; then
+            bash .github/scripts/npm-publish-oidc.sh "$TARGET" --pnpm-pack
+            exit 0
+          fi
+          # Publish each non-private package on its own, so one failure does
+          # not leave every later package unpublished. Versions already on npm
+          # are skipped by the script, so a re-run is safe.
+          FAILED=""
+          for dir in packages/* adapters/*; do
+            [ -f "$dir/package.json" ] || continue
+            if [ "$(node -p "require('./$dir/package.json').private === true")" = "true" ]; then
+              echo "Skipping private package: $dir"
+              continue
             fi
-          }
-          if [ "${{ needs.release-routing.outputs.mode }}" = "all" ]; then
-            # Publish each non-private package independently. `pnpm publish -r`
-            # bails on the FIRST per-package error (e.g. an already-published
-            # version, or npm's 24h block after an unpublish), leaving every
-            # package after it unpublished. Looping + per-package publish_safely
-            # makes the release idempotent: already-published packages are
-            # skipped and the rest still publish.
-            echo "Publishing all non-private workspace packages individually..."
-            FAILED=""
-            for dir in packages/* adapters/*; do
-              [ -f "$dir/package.json" ] || continue
-              IS_PRIVATE=$(node -p "require('./$dir/package.json').private === true" 2>/dev/null || echo "false")
-              if [ "$IS_PRIVATE" = "true" ]; then
-                echo "Skipping private package: $dir"
-                continue
-              fi
-              PKG_NAME=$(node -p "require('./$dir/package.json').name" 2>/dev/null)
-              echo "→ Publishing $PKG_NAME ($dir)"
-              publish_safely "pnpm publish -C $dir --no-git-checks --access public" || FAILED="$FAILED $PKG_NAME"
-            done
-            if [ -n "$FAILED" ]; then
-              echo "::error::Failed to publish:$FAILED"
-              exit 1
-            fi
-          else
-            echo "Publishing single package in ${{ needs.release-routing.outputs.target }}..."
-            publish_safely "pnpm publish --no-git-checks --access public -C ${{ needs.release-routing.outputs.target }}"
+            bash .github/scripts/npm-publish-oidc.sh "$dir" --pnpm-pack || FAILED="$FAILED $dir"
+          done
+          if [ -n "$FAILED" ]; then
+            echo "::error::Failed to publish:$FAILED"
+            exit 1
           fi

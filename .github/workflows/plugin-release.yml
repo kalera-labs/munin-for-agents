@@ -13,25 +13,31 @@ on:
       # NOTE: Distinct from `munin-claude-v*` (which triggers adapter release in release.yml)
       - "plugin-claude-v*"
 
+permissions:
+  contents: read
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Trusted publishing (OIDC): the trusted publisher of
+    # @kalera/munin-claude-plugin names this file and this environment.
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Node 24 ships npm 11 (trusted publishing needs >= 11.5.1).
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Create package.json for plugin
         run: node .github/scripts/create-plugin-pkg.js
 
       - name: Publish to NPM
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
-          npm publish /tmp/munin-pkg --access public --tag latest
+        run: bash .github/scripts/npm-publish-oidc.sh /tmp/munin-pkg

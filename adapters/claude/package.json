@@ -17,5 +17,10 @@
     "@types/node": "^24.3.0",
     "typescript": "^5.9.2"
   },
-  "version": "1.6.0"
+  "version": "1.6.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalera-labs/munin-for-agents.git",
+    "directory": "adapters/claude"
+  }
 }

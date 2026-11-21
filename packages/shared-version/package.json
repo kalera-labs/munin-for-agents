@@ -1,6 +1,11 @@
 {
   "name": "@kalera/munin-shared-version",
   "version": "1.6.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalera-labs/munin-for-agents.git",
+    "directory": "packages/shared-version"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
